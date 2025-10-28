@@ -29,38 +29,83 @@ class _MovieListViewState extends ConsumerState<MovieListView> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(movieListProvider);
-    if (state.status == MovieListStatus.initial || (state.status == MovieListStatus.loading && state.movies.isEmpty)) {
+    if (state.status == MovieListStatus.initial ||
+        (state.status == MovieListStatus.loading && state.movies.isEmpty)) {
       // show shimmer grid
       return GridView.builder(
         padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.65),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.65,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+        ),
         itemCount: 6,
         itemBuilder: (_, __) => const ShimmerMovieCard(),
       );
     }
     if (state.status == MovieListStatus.error && state.movies.isEmpty) {
-      return Center(child: ErrorRetry(message: state.error ?? 'Error', onRetry: () => ref.read(movieListProvider.notifier).refresh()));
+      return Center(
+        child: ErrorRetry(
+          message: state.error ?? 'Error',
+          onRetry: () => ref.read(movieListProvider.notifier).refresh(),
+        ),
+      );
     }
 
     // show loaded content
     return RefreshIndicator(
       onRefresh: () => ref.read(movieListProvider.notifier).refresh(),
-      child: GridView.builder(
+      child: CustomScrollView(
         controller: _scrollController,
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.65),
-        itemCount: state.hasMore ? state.movies.length + 1 : state.movies.length,
-        itemBuilder: (context, index) {
-          if (index >= state.movies.length) {
-            // loading indicator at bottom
-            return const Padding(
-              padding: EdgeInsets.all(8),
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }
-          final movie = state.movies[index];
-          return MovieCard(movie: movie);
-        },
+        slivers: [
+          SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.65,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              if (index >= state.movies.length) {
+                return const SizedBox.shrink();
+              }
+              return MovieCard(movie: state.movies[index]);
+            }, childCount: state.movies.length),
+          ),
+          if (state.hasMore)
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).shadowColor.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
