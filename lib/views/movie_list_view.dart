@@ -70,7 +70,10 @@ class _MovieListViewState extends ConsumerState<MovieListView> {
               if (index >= state.movies.length) {
                 return const SizedBox.shrink();
               }
-              return MovieCard(movie: state.movies[index]);
+              return MovieCard(
+                movie: state.movies[index],
+                heroTagSuffix: '-list-$index',
+              );
             }, childCount: state.movies.length),
           ),
           if (state.hasMore)

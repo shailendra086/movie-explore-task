@@ -7,10 +7,74 @@ import '../providers/movie_list_provider.dart';
 
 class MovieDetailView extends ConsumerStatefulWidget {
   final int movieId;
-  const MovieDetailView({required this.movieId, Key? key}) : super(key: key);
+  final String? heroTagSuffix;
+
+  const MovieDetailView({required this.movieId, this.heroTagSuffix, Key? key})
+    : super(key: key);
 
   @override
   ConsumerState<MovieDetailView> createState() => _MovieDetailViewState();
+}
+
+class _InfoCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color? iconColor;
+  final Color backgroundColor;
+  final Color textColor;
+
+  const _InfoCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.backgroundColor,
+    required this.textColor,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 20, color: iconColor ?? textColor),
+              const SizedBox(width: 8),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _MovieDetailViewState extends ConsumerState<MovieDetailView> {
@@ -94,7 +158,8 @@ class _MovieDetailViewState extends ConsumerState<MovieDetailView> {
             flexibleSpace: FlexibleSpaceBar(
               background: movie!.posterPath.isNotEmpty
                   ? Hero(
-                      tag: 'movie-poster-${movie!.id}',
+                      tag:
+                          'movie-poster-${movie!.id}${widget.heroTagSuffix ?? ''}',
                       child: CachedNetworkImage(
                         imageUrl:
                             '${ApiConstants.imageBaseUrl}${movie!.posterPath}',
@@ -123,75 +188,63 @@ class _MovieDetailViewState extends ConsumerState<MovieDetailView> {
                   ),
                   const SizedBox(height: 16),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.star,
-                              size: 16,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onPrimaryContainer,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              movie!.voteAverage.toString(),
-                              style: TextStyle(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                          ],
-                        ),
+                      _InfoCard(
+                        label: 'Rating',
+                        value: '${movie!.voteAverage.toStringAsFixed(1)}/10',
+                        icon: Icons.star_rounded,
+                        iconColor: Colors.amber,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer,
+                        textColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer,
                       ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          movie!.releaseDate,
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSecondaryContainer,
-                          ),
-                        ),
+                      const SizedBox(width: 24),
+                      _InfoCard(
+                        label: 'Release Date',
+                        value: movie!.releaseDate,
+                        icon: Icons.calendar_today_rounded,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer,
+                        textColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimaryContainer,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   Text(
-                    'Overview',
+                    'Movie Description',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    movie!.overview,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyLarge?.copyWith(height: 1.5),
-                    textAlign: TextAlign.justify,
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceVariant.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withOpacity(0.1),
+                      ),
+                    ),
+                    child: Text(
+                      movie!.overview,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        height: 1.5,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
                   ),
                 ],
               ),

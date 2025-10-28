@@ -40,73 +40,108 @@ class _SearchViewState extends ConsumerState<SearchView> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
+        titleSpacing: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.secondaryContainer.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+              child: IconButton(
+                iconSize: 20,
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
             ),
-            onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).shadowColor.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+        title: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                width: 1,
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.search,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  autofocus: true,
-                  onChanged: _onSearchChanged,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).shadowColor.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 22,
                   ),
-                  cursorColor: Theme.of(context).colorScheme.primary,
-                  decoration: InputDecoration(
-                    hintText: 'Search movies...',
-                    hintStyle: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    autofocus: true,
+                    onChanged: _onSearchChanged,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
                     ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                    cursorColor: Theme.of(context).colorScheme.primary,
+                    cursorWidth: 2,
+                    cursorRadius: const Radius.circular(2),
+                    decoration: InputDecoration(
+                      hintText: 'Search for movies...',
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 16,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
                   ),
                 ),
-              ),
-              if (_controller.text.isNotEmpty)
-                IconButton(
-                  icon: Icon(
-                    Icons.clear,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                if (_controller.text.isNotEmpty)
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        _controller.clear();
+                        ref.read(searchProvider.notifier).search('');
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          size: 20,
+                        ),
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    _controller.clear();
-                    ref.read(searchProvider.notifier).search('');
-                  },
-                ),
-            ],
+                const SizedBox(width: 4),
+              ],
+            ),
           ),
         ),
       ),
@@ -209,7 +244,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
       itemCount: state.results.length,
       itemBuilder: (_, index) {
         final movie = state.results[index];
-        return MovieCard(movie: movie);
+        return MovieCard(movie: movie, heroTagSuffix: '-search-$index');
       },
     );
   }
