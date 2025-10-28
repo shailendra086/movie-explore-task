@@ -17,7 +17,6 @@ A Flutter application that allows users to explore movies using The Movie Databa
 ## Prerequisites
 
 - Flutter SDK (^3.9.2)
-- TMDb API Key (get it from [themoviedb.org](https://www.themoviedb.org/settings/api))
 
 ## Setup Instructions
 
@@ -28,20 +27,13 @@ A Flutter application that allows users to explore movies using The Movie Databa
    cd movieexplorer
    ```
 
-2. **Create `.env` file**
-   Create a new file named `.env` in the project root and add your TMDb API key:
-
-   ```
-   TMDB_API_KEY=your_api_key_here
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
 
    ```bash
    flutter pub get
    ```
 
-4. **Run the app**
+3. **Run the app**
    ```bash
    flutter run
    ```

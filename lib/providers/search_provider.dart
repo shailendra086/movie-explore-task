@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:movieexplorer/providers/movie_list_provider.dart';
+import '../core/network_exceptions.dart';
 import '../models/movie.dart';
 import '../repositories/movie_repository.dart';
 
@@ -27,12 +28,18 @@ class SearchNotifier extends StateNotifier<SearchState> {
       final res = await repo.search(query);
       state = SearchState(results: res, loading: false);
     } catch (e) {
-      state = SearchState(results: [], loading: false, error: e.toString());
+      state = SearchState(
+        results: [],
+        loading: false,
+        error: NetworkException.getUserFriendlyMessage(e),
+      );
     }
   }
 }
 
-final searchProvider = StateNotifierProvider<SearchNotifier, SearchState>((ref) {
+final searchProvider = StateNotifierProvider<SearchNotifier, SearchState>((
+  ref,
+) {
   final repo = ref.read(movieRepositoryProvider);
   return SearchNotifier(repo);
 });

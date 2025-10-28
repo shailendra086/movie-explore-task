@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:movieexplorer/services/tmdb_api_service.dart';
+import '../core/network_exceptions.dart';
 import '../models/movie.dart';
 import '../repositories/movie_repository.dart';
 
@@ -67,7 +68,7 @@ class MovieListNotifier extends StateNotifier<MovieListState> {
     } catch (e) {
       state = state.copyWith(
         status: MovieListStatus.error,
-        error: e.toString(),
+        error: NetworkException.getUserFriendlyMessage(e),
       );
     }
   }
