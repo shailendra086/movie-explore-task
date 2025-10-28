@@ -81,7 +81,7 @@ class _SearchViewState extends ConsumerState<SearchView> {
     }
 
     if (state.results.isEmpty && _controller.text.isEmpty) {
-      return const Center(child: Text('Start typing to search for movies'));
+      return const Center(child: Text('Start typing to search for movies',style: TextStyle(color: Colors.black,),));
     }
 
     return GridView.builder(

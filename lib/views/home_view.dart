@@ -10,11 +10,15 @@ class HomeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Movie Explorer'),
+        title: Text('Movie', style: Theme.of(context).textTheme.titleLarge),
+
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchView())),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SearchView()),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.brightness_6),

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/movie.dart';
 import '../core/constants.dart';
-import '../services/tmdb_api_service.dart';
+import '../providers/movie_list_provider.dart';
 
-class MovieDetailView extends StatefulWidget {
+class MovieDetailView extends ConsumerStatefulWidget {
   final int movieId;
   const MovieDetailView({required this.movieId, Key? key}) : super(key: key);
 
   @override
-  State<MovieDetailView> createState() => _MovieDetailViewState();
+  ConsumerState<MovieDetailView> createState() => _MovieDetailViewState();
 }
 
-class _MovieDetailViewState extends State<MovieDetailView> {
-  final _service = TmdbApiService();
+class _MovieDetailViewState extends ConsumerState<MovieDetailView> {
   Movie? movie;
   bool loading = true;
   String? error;
@@ -29,7 +29,8 @@ class _MovieDetailViewState extends State<MovieDetailView> {
       error = null;
     });
     try {
-      final m = await _service.fetchMovieDetails(widget.movieId);
+      final service = ref.read(tmdbServiceProvider);
+      final m = await service.fetchMovieDetails(widget.movieId);
       setState(() {
         movie = m;
         loading = false;
@@ -44,9 +45,10 @@ class _MovieDetailViewState extends State<MovieDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading)
+    if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    if (error != null)
+    }
+    if (error != null) {
       return Scaffold(
         body: Center(
           child: Column(
@@ -58,27 +60,38 @@ class _MovieDetailViewState extends State<MovieDetailView> {
           ),
         ),
       );
+    }
     return Scaffold(
-      appBar: AppBar(title: Text(movie!.title)),
+      appBar: AppBar(title: Text(movie!.title), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             if (movie!.posterPath.isNotEmpty)
               Image.network('${ApiConstants.imageBaseUrl}${movie!.posterPath}'),
-            const SizedBox(height: 12),
-            Text(movie!.title, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
+            const SizedBox(height: 24),
+            Text(
+              movie!.title,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
             Row(
               children: [
-                const Icon(Icons.star),
+                const Icon(Icons.star, size: 16),
+                const SizedBox(width: 4),
                 Text(movie!.voteAverage.toString()),
                 const SizedBox(width: 16),
                 Text(movie!.releaseDate),
               ],
             ),
             const SizedBox(height: 12),
-            Text(movie!.overview),
+            Text(
+              movie!.overview,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ],
         ),
       ),

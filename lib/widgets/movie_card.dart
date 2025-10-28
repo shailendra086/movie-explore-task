@@ -10,7 +10,10 @@ class MovieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MovieDetailView(movieId: movie.id))),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => MovieDetailView(movieId: movie.id)),
+      ),
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -19,15 +22,26 @@ class MovieCard extends StatelessWidget {
             Expanded(
               child: movie.posterPath.isNotEmpty
                   ? CachedNetworkImage(
-                      imageUrl: '${ApiConstants.imageBaseUrl}${movie.posterPath}',
+                      imageUrl:
+                          '${ApiConstants.imageBaseUrl}${movie.posterPath}',
                       fit: BoxFit.cover,
                       width: double.infinity,
                     )
-                  : Container(color: Colors.grey, child: const Center(child: Icon(Icons.movie))),
+                  : Container(
+                      color: Colors.grey,
+                      child: const Center(child: Icon(Icons.movie)),
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(movie.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+              child: Text(
+                movie.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -37,10 +51,14 @@ class MovieCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(movie.voteAverage.toString()),
                   const Spacer(),
-                  Text(movie.releaseDate.isNotEmpty ? movie.releaseDate.split('-')[0] : ''),
+                  Text(
+                    movie.releaseDate.isNotEmpty
+                        ? movie.releaseDate.split('-')[0]
+                        : '',
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

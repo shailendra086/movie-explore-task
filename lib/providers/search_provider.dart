@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:movieexplorer/providers/movie_list_provider.dart';
 import '../models/movie.dart';

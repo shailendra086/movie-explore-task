@@ -22,11 +22,11 @@ class MovieListState {
   });
 
   MovieListState.initial()
-      : movies = [],
-        page = 1,
-        hasMore = true,
-        status = MovieListStatus.initial,
-        error = null;
+    : movies = [],
+      page = 1,
+      hasMore = true,
+      status = MovieListStatus.initial,
+      error = null;
 
   MovieListState copyWith({
     List<Movie>? movies,
@@ -65,7 +65,10 @@ class MovieListNotifier extends StateNotifier<MovieListState> {
         status: MovieListStatus.loaded,
       );
     } catch (e) {
-      state = state.copyWith(status: MovieListStatus.error, error: e.toString());
+      state = state.copyWith(
+        status: MovieListStatus.error,
+        error: e.toString(),
+      );
     }
   }
 
@@ -75,9 +78,15 @@ class MovieListNotifier extends StateNotifier<MovieListState> {
   }
 }
 
-final tmdbServiceProvider = Provider((ref) => TmdbApiService());
-final movieRepositoryProvider = Provider((ref) => MovieRepository(ref.read(tmdbServiceProvider)));
-final movieListProvider = StateNotifierProvider<MovieListNotifier, MovieListState>((ref) {
-  final repo = ref.read(movieRepositoryProvider);
-  return MovieListNotifier(repo);
+final tmdbServiceProvider = Provider<TmdbApiService>((ref) => TmdbApiService());
+
+final movieRepositoryProvider = Provider<MovieRepository>((ref) {
+  final service = ref.watch(tmdbServiceProvider);
+  return MovieRepository(service);
 });
+
+final movieListProvider =
+    StateNotifierProvider<MovieListNotifier, MovieListState>((ref) {
+      final repo = ref.watch(movieRepositoryProvider);
+      return MovieListNotifier(repo);
+    });
